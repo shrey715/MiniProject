@@ -10,11 +10,19 @@ username=0
 password=0
 
 def sqlconnect(x):
-    global username, password, file, check
+    global username, password
     
+    u=open("Variables\SQLUsername.txt","w")
+    p=open("Variables\SQLPassword.txt","w")
+
     file=open("Variables\InitialisationCheck.txt","w")
     userValue=str(username.get())
     pwdValue=str(password.get())
+
+    u.write(userValue)
+    p.write(pwdValue)
+    u.close()
+    p.close()
 
     connect=sql.connect(host='localhost',user=userValue, passwd=pwdValue)
     if connect.is_connected():
@@ -47,7 +55,7 @@ def sqlconnect(x):
     
 def mainwin():
     global username,password
-    
+
     sqllogin = Tk()
     sqllogin.title("Initialisation")
 
@@ -65,3 +73,5 @@ def mainwin():
     Login.grid(column=2,row=3)
 
     sqllogin.mainloop()
+
+mainwin()
