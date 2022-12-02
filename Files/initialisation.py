@@ -73,5 +73,3 @@ def mainwin():
     Login.grid(column=2,row=3)
 
     sqllogin.mainloop()
-
-mainwin()
