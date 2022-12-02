@@ -1,58 +1,16 @@
 import random
 import datetime
 
-#MySql part of the code
-
 import mysql.connector as sql
-from datetime import date
+from tkinter import * 
 
+#CREATES DATABASE AND TABLES ONLY
+#TO BE RUN BEFORE FIRST EXECUTION
 
-#username = input("Enter the username for MySQL: ")
-#password = input("Enter the password for MySQL: ")
-
-'''custid2 = int(custid)
-ename2 = str(ename)
-roomno2 = int(roomno)
-phno2 = str(phno)
-addr2 = str(addr)
-checkin2 = date(checkin)
-checkout2 = date(checkout)
-roombill = int(price*day)
-rc2 = int(rc)
-totalbill = roombill+rc2
-
-
-connected=False
-
-connect=sql.connect(host='localhost',user="root" ,passwd="Rem#1p5" ,database='Hotel_Management_System')
-if connect.is_connected():
-        connected=True
-        print("connected")
-    
-cur=connect.cursor()
-
-cur.execute("create table if not exists Customer_Records(Customer_ID int primary key, Cname varchar(25), RoomNo int, PhoneNo char(10), Address varchar(100));")
-cur.execute("create table if not exists Room_Details(RoomNo int primary key, Check_In_Date date, Check_Out_Date date, Room_Bill int, Food_Bill int, Total_Bill int);")
-cur.execute("insert into Customer_Records (Customer_ID, Cname, RoomNo, PhoneNo, Address)values(%s,%s,%s,%s,%s);",(custid2,ename2,roomno2,phno2,addr2))
-cur.execute("insert into Room_Details(RoomNo , Check_In_Date, Check_Out_Date, Room_Bill, Food_Bill , Total_Bill)values(%s,%s,%s,%s,%s,%s);",(roomno2,checkin2,checkout2,roombill,rc2,totalbill))
-
-cur.execute("select Customer_ID , Cname, Customer_Records.RoomNo, PhoneNo , Address from Customer_Records , Room_Details where Customer_Records.RoomNo=Room_Details.RoomNo;")
-list1 = cur.fetchall()
-print(list1)
+username=0
+password=0
 
     
-
-
-connect.commit()
-
-connect.close()'''
-
-
-#except Exception as e:
- #   print("Some error occured during DB connection", e)
-
-
-
 # Global List Declaration
 ename = []
 phno = []
@@ -109,7 +67,7 @@ def Home():
 
 # Function used in booking
 
-def date(c):
+def dates(c):
 	
 	if c[0] >= 2022 and c[0] <= 2050:
 		
@@ -187,6 +145,7 @@ def Booking():
 		# used global keyword to
 		# use global variable 'i'
 		global i
+		global custid,ename,roomno,phno,addr,checkin,checkout,price,day,rc
 		print(" BOOKING ROOMS")
 		print(" ")
 		
@@ -211,7 +170,7 @@ def Booking():
 		ci[0]=int(ci[0])
 		ci[1]=int(ci[1])
 		ci[2]=int(ci[2])
-		date(ci)
+		dates(ci)
 		
 		coo=str(input("Check-Out(yyyy/mm/dd): "))
 		checkout.append(coo)
@@ -242,7 +201,7 @@ def Booking():
 		else:
 			pass
 		
-		date(co)
+		dates(co)
 		d1 = datetime.datetime(ci[0],ci[1],ci[2])
 		d2 = datetime.datetime(co[0],co[1],co[2])
 		d = (d2-d1).days
@@ -291,15 +250,15 @@ def Booking():
 
 		# randomly generating room no. and customer
 		# id for customer
-		rn = random.randrange(40)+300
-		cid = random.randrange(40)+10
+		rn = random.randrange(899)+3000
+		cid = random.randrange(80000)+100000
 		
 		
 		# checks if alloted room no. & customer
 		# id already not alloted
 		while rn in roomno or cid in custid:
-			rn = random.randrange(60)+300
-			cid = random.randrange(60)+10
+			rn = random.randrange(899)+3000
+			cid = random.randrange(80000)+100000
 			
 		rc.append(0)
 		p.append(0)
@@ -333,6 +292,7 @@ def Booking():
 			Home()
 		else:
 			exit()
+		
 
 # ROOMS INFO
 def Rooms_Info():
@@ -534,10 +494,10 @@ def Payment():
 					
 					# pops room no. and customer id from list and
 					# later assigns zero at same position
-					roomno.pop(n)
+					'''roomno.pop(n)
 					custid.pop(n)
 					roomno.insert(n,0)
-					custid.insert(n,0)
+					custid.insert(n,0)'''
 					
 			else:
 				
@@ -560,10 +520,12 @@ def Payment():
 
 # RECORD FUNCTION
 def Record():
-	
+	global custid,ename,roomno,phno,addr,checkin,checkout,price,day,rc
+	initialisation()
+	show()
 	# checks if any record exists or not
 	if phno!=[]:
-		print("	 *** HOTEL RECORD ***\n")
+		print("	 *** HOTEL RECORD FOR THIS ENTRY ***\n")
 		print("| Name	 | Phone No. | Address	 | Check-In | Check-Out	 | Room Type	 | Price	 |")
 		print("----------------------------------------------------------------------------------------------------------------------")
 		
@@ -581,46 +543,55 @@ def Record():
 	else:
 		exit()
 
-# Driver Code
-#Home()
+def initialisation():
+  global custid,ename,roomno,phno,addr,checkin,checkout,price,day,rc
+  for j in range(len(custid)):
+        custid2=int(custid[j])
+        ename2=str(ename[j])
+        roomno2 = int(roomno[j])
+        phno2 = str(phno[j])
+        addr2 = str(addr[j])
+        roombill = int(price[j]*day[j])
+        rc2 = int(rc[j])
+        totalbill = roombill+rc2
+        x=checkin[j].split('/')
+        checkin2=datetime.date(int(x[0]),int(x[1]),int(x[2]))
+        y=checkout[j].split('/')
+        checkout2=datetime.date(int(y[0]),int(y[1]),int(y[2]))
+        connected=False
 
-
-'''custid2 = int(custid)
-ename2 = str(ename)
-roomno2 = int(roomno)
-phno2 = str(phno)
-addr2 = str(addr)
-checkin2 = date(checkin)
-checkout2 = date(checkout)
-roombill = int(price*day)
-rc2 = int(rc)
-totalbill = roombill+rc2
-
-
-connected=False
-
-connect=sql.connect(host='localhost',user="root" ,passwd="Rem#1p5" ,database='Hotel_Management_System')
-if connect.is_connected():
-        connected=True
-        print("connected")
+        connect=sql.connect(host='localhost',user="root" ,passwd="123456" ,database='Hotel_Management_System')
+        if connect.is_connected():
+                connected=True
+                print("connected")
     
-cur=connect.cursor()
+        cur=connect.cursor()
 
-cur.execute("create table if not exists Customer_Records(Customer_ID int primary key, Cname varchar(25), RoomNo int, PhoneNo char(10), Address varchar(100));")
-cur.execute("create table if not exists Room_Details(RoomNo int primary key, Check_In_Date date, Check_Out_Date date, Room_Bill int, Food_Bill int, Total_Bill int);")
-cur.execute("insert into Customer_Records (Customer_ID, Cname, RoomNo, PhoneNo, Address)values(%s,%s,%s,%s,%s);",(custid2,ename2,roomno2,phno2,addr2))
-cur.execute("insert into Room_Details(RoomNo , Check_In_Date, Check_Out_Date, Room_Bill, Food_Bill , Total_Bill)values(%s,%s,%s,%s,%s,%s);",(roomno2,checkin2,checkout2,roombill,rc2,totalbill))
+        cur.execute("create table if not exists Customer_Records(Customer_ID int primary key, Cname varchar(25), RoomNo int, PhoneNo char(10), Address varchar(100));")
+        cur.execute("create table if not exists Room_Details(RoomNo int primary key, Check_In_Date date, Check_Out_Date date, Room_Bill int, Food_Bill int, Total_Bill int);")
+        cur.execute("insert into Customer_Records (Customer_ID, Cname, RoomNo, PhoneNo, Address)values(%s,%s,%s,%s,%s);",(custid2,ename2,roomno2,phno2,addr2))
+        cur.execute("insert into Room_Details(RoomNo , Check_In_Date, Check_Out_Date, Room_Bill, Food_Bill , Total_Bill)values(%s,%s,%s,%s,%s,%s);",(roomno2,checkin2,checkout2,roombill,rc2,totalbill))
+        #cur.execute("select Customer_ID , Cname, Customer_Records.RoomNo, PhoneNo , Address from Customer_Records , Room_Details where Customer_Records.RoomNo=Room_Details.RoomNo;")
+        connect.commit()
+        connect.close()
+def show():
+    connected=False
 
-cur.execute("select Customer_ID , Cname, Customer_Records.RoomNo, PhoneNo , Address from Customer_Records , Room_Details where Customer_Records.RoomNo=Room_Details.RoomNo;")
-list1 = cur.fetchall()
-print(list1)
-
+    connect=sql.connect(host='localhost',user="root" ,passwd="123456" ,database='Hotel_Management_System')
+    if connect.is_connected():
+            connected=True
+            print("connected")
     
-
-
-connect.commit()
-
-connect.close()'''
+    cur=connect.cursor()
+    cur.execute("select Customer_ID , Cname, Customer_Records.RoomNo, PhoneNo , Address from Customer_Records , Room_Details where Customer_Records.RoomNo=Room_Details.RoomNo;")
+    list1=cur.fetchall()
+    print("The Customer Records are: ",list1)
+    cur.execute("select Room_Details.RoomNo,Check_In_Date, Check_Out_Date, Room_Bill, Food_Bill , Total_Bill from Customer_Records , Room_Details where Customer_Records.RoomNo=Room_Details.RoomNo;")
+    list2=cur.fetchall()
+    print("The Room details are: ",list2)
+    connect.commit()
+    connect.close()
 
 # Driver Code
 Home()
+

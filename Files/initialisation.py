@@ -1,5 +1,7 @@
 import mysql.connector as sql
 from tkinter import * 
+from tkinter import messagebox
+import pickle
 
 #CREATES DATABASE AND TABLES ONLY
 #TO BE RUN BEFORE FIRST EXECUTION
@@ -7,14 +9,16 @@ from tkinter import *
 username=0
 password=0
 
-def sqlconnect():
-    global username
-    global password
+def sqlconnect(x):
+    global username, password, file, check
     
+    file=open("Variables\InitialisationCheck.txt","w")
     userValue=str(username.get())
     pwdValue=str(password.get())
 
-    connect=sql.connect(host='localhost',user=userValue ,passwd=pwdValue)
+    connect=sql.connect(host='localhost',user=userValue, passwd=pwdValue)
+    if connect.is_connected():
+       check=1
     cur=connect.cursor()
 
     cur.execute("CREATE DATABASE IF NOT EXISTS HOTEL_MANAGEMENT_SYSTEM") 
@@ -22,6 +26,8 @@ def sqlconnect():
     connect.close()
 
     connect=sql.connect(host='localhost',user=userValue ,passwd=pwdValue ,database='HOTEL_MANAGEMENT_SYSTEM')
+    if connect.is_connected():
+        check=2
     cur=connect.cursor()
 
     cur.execute("create table if not exists Customer_Records(Customer_ID int primary key, Cname varchar(25), RoomNo int, PhoneNo char(10), Address varchar(100));")
@@ -29,10 +35,19 @@ def sqlconnect():
     connect.commit()
     connect.close()
 
+    if check==0:
+        messagebox.showerror("Error","Login Succesful")
+    elif check==1:
+        messagebox.showerror("Error","Table Creation Unsuccessful")
+    elif check==2:
+        messagebox.showinfo("Confirm","Login and Table Creation Successful")
+        x.destroy()
+    file.write(f'{check}')
+    file.close()
+    
 def mainwin():
-    global username
-    global password
-
+    global username,password
+    
     sqllogin = Tk()
     sqllogin.title("Initialisation")
 
@@ -46,7 +61,7 @@ def mainwin():
     password=Entry(sqllogin,show="*",width=20)
     password.grid(column=3,row=2)
     
-    Login = Button(sqllogin, text="Login", command=sqlconnect)
+    Login = Button(sqllogin, text="Login", command=lambda: sqlconnect(sqllogin))
     Login.grid(column=2,row=3)
 
     sqllogin.mainloop()
