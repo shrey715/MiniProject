@@ -1,7 +1,9 @@
 from tkinter import *
+from tkinter import messagebox
 from tkcalendar import DateEntry
-from datetime import date
-import mysql.connector as mysql
+from Customer import CustomerClass
+from random import randrange
+import connector
 
 with open("Variables\SQLUsername.txt","r") as file:
     userValue=file.readline()
@@ -9,26 +11,79 @@ with open("Variables\SQLUsername.txt","r") as file:
 with open("Variables\SQLPassword.txt","r") as file:
     pwdValue=file.readline()
 
-f1=open("Variables\CustomerClass\CustomerName.txt","w")
-f2=open("Variables\CustomerClass\CustomerPhoneNumber.txt","w")
-f3=open("Variables\CustomerClass\CustomerAddress.txt","w")
-f4=open("Variables\CustomerClass\CustomerCheckInDate.txt","w")
-f5=open("Variables\CustomerClass\CustomerCheckOutDate.txt","w")
-f6=open("Variables\CustomerClass\CustomerRoom.txt","w")
-f7=open("Variables\CustomerClass\CustomerRoomBill.txt","w")
-f8=open("Variables\CustomerClass\CustomerRoomNo.txt","w")
+def confirmcheck():
+    if len(str(PhNo.get()).strip())==10 and ChkInDate.get_date()<ChkOutDate.get_date():
+        gen()
+        confirmation()
+    if len(str(PhNo.get()).strip())!=10:
+        messagebox.showerror("Error","Invalid phone number")
+    if not ChkInDate.get_date()<ChkOutDate.get_date():
+        messagebox.showerror("Error","Invalid check-in and check-out dates selected")
 
 def confirmation():
-    f1.write(str(CName.get()))
-    f2.write(str(PhNo.get()))
-    f3.write(str(Addr.get()))
-    f4.write(str(ChkInDate.get()))
-    f5.write(str(ChkOutDate.get()))
-    f6.write(str(clicked.get()))
+    customer=CustomerClass.Customer()
+    customer.customer_name=CName.get()
+    customer.customer_id=custid
+    customer.phno=PhNo.get()
+    customer.address=Addr.get()
+    customer.checkin=ChkInDate.get().replace("/","-")
+    customer.checkout=ChkOutDate.get().replace("/","-")
+    customer.roomtype=room.get()
+
+    if room.get()==Rooms[0]:
+        rmno=f"D{rno}"
+    elif room.get()==Rooms[1]:
+        rmno=f"C{rno}"
+    elif room.get()==Rooms[2]:
+        rmno=f"B{rno}"
+    elif room.get()==Rooms[3]:
+        rmno=f"A{rno}"
+    customer.roomno=rmno
+
+    customer.roombill=RoomBill()
+    customer.foodbill=0
+    customer.totalbill=0
+
+    customer.customer_update()
+    customer.customer_update_sql()
+    customer.room_update_sql()    
+
+def gen():
+    global custid, rno
+
+    sqlobj=connector.SQLCursor()
+    sqlobj.sqlconnect()
+    sqlobj.sqlcursor.execute("SELECT RoomNo from Room_Details;")
+    RoomNoList=sqlobj.sqlcursor.fetchall()
+    sqlobj.sqlcursor.execute("SELECT Customer_ID from customer_records;")
+    CustIDList=sqlobj.sqlcursor.fetchall()
+    sqlobj.connect.close()
+
+    rno=randrange(1,10000)
+    custid=randrange(80000)+100000
+
+    while rno in RoomNoList or custid in CustIDList:
+        rno=randrange(899)+3000
+        custid=randrange(80000)+100000
+
+def RoomBill():
+    days=(ChkOutDate.get_date()-ChkInDate.get_date()).days
+    
+    if room.get()==Rooms[0]:
+        return days*3500
+    elif room.get()==Rooms[1]:
+        return days*4000
+    elif room.get()==Rooms[2]:
+        return days*4500
+    elif room.get()==Rooms[3]:
+        return days*5000
+
+def destroy():
+    BookingRooms.destroy()
 
 def BookingButton():
-    global CName, PhNo, Addr, ChkInDate, ChkOutDate, clicked
-    
+    global BookingRooms, CName, PhNo, Addr, ChkInDate, ChkOutDate, room, Rooms
+
     BookingRooms = Tk()
     BookingRooms.title("Booking")
     BookingRooms.geometry("500x500")
@@ -58,22 +113,24 @@ def BookingButton():
     ChkOutDate=DateEntry(BookingRooms, selectmode='day', date_pattern ='yyyy/mm/dd')
     ChkOutDate.grid(row=4,column=1, pady=5)
 
-    #Note= add check for diff chk in chk out dates
-
     Rooms=["Standard Non-AC",
          "Standard AC",
          "3-Bed Non-AC",
           "3-Bed AC"]
 
-    clicked=StringVar()
-    clicked.set("Standard Non-AC")
-
+    room=StringVar()
+    room.set("Standard Non-AC")
+    
     RoomTypeLabel=Label(BookingRooms, text="Enter Room Type>> ")
     RoomTypeLabel.grid(row=5, column=0, pady=5)
-    RoomType=OptionMenu(BookingRooms, clicked, *Rooms)
+    RoomType=OptionMenu(BookingRooms, room, *Rooms)
     RoomType.grid(row=5, column=1, pady=5)
 
-    ConfirmButton=Button(BookingRooms, text="Click to Book", command=confirmation)
+    ConfirmButton=Button(BookingRooms, text="Click to Book", command=lambda: [confirmcheck()])
     ConfirmButton.grid(row=6,column=1, pady=5)
 
+    BackButton=Button(BookingRooms, text="Back", command=lambda:destroy())
+    BackButton.grid(row=7,column=1,pady=5)
+
     BookingRooms.mainloop()
+

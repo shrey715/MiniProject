@@ -1,7 +1,6 @@
 import mysql.connector as sql
 from tkinter import * 
 from tkinter import messagebox
-import pickle
 
 #CREATES DATABASE AND TABLES ONLY
 #TO BE RUN BEFORE FIRST EXECUTION
