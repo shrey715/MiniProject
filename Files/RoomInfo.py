@@ -7,7 +7,7 @@ def RoomsInfoButton():
     global RoomsInfo
     RoomsInfo=Tk()
     RoomsInfo.title("Room Information")
-    RoomsInfo.geometry("1000x500")
+    RoomsInfo.geometry("1000x500+500+100")
 
     TitleMsg=Label(RoomsInfo, text="HOTEL ROOMS INFO", font="Impact 15 underline")
     TitleMsg.pack(pady=10)

@@ -1,13 +1,10 @@
 from tkinter import *
 from PIL import ImageTk, Image
 from Customer import CustomerClass
-from pickle import *
+import connector
+from tkinter import messagebox
 
-def onCall():
-    global r
-    with open("Files\Customer\customer.dat","rb") as file:
-        li=load(file)
-        r=load[9]
+r=0
 
 def destroyCard():
     MainWin.destroy()
@@ -17,7 +14,7 @@ def MenuCard():
     MainWin=Tk()
     MainWin.title("Menu Card")
 
-    MainWin.geometry("500x700")
+    MainWin.geometry("500x700+500+100")
     MainWin.maxsize(500,700)
     MainWin.minsize(500,700)
 
@@ -86,11 +83,12 @@ def onclick_order():
         DisplayLabel.text="WRONG CHOICE!"
 
 def onclick_totalbill():
-    DisplayLabel=Label(DisplayFrame,text=f"Total bill is {r}")
-    customer=CustomerClass.Customer()
-    customer.customer_load()
-    customer.foodbill=r
-    customer.customer_update()
+    messagebox.showinfo("Bill",f"Total bill is {r}")
+    global custobj
+    custobj=CustomerClass.Customer()
+    custobj.customer_load(int(custID.get()))
+    custobj.foodbill=custobj.foodbill + r
+    custobj.customer_update_foodbill(custobj.foodbill,custobj.roomno)
 
 def onclick_cancel():
     global r
@@ -140,20 +138,18 @@ def onclick_cancel():
     else:
         DisplayLabel.text="WRONG CHOICE!"
 
-def RoomServiceButton():
-    onCall()
+def on_click():
+    sqlObj=connector.SQLCursor()
+    sqlObj.sqlconnect()
+    sqlObj.sqlcursor.execute("SELECT Customer_ID FROM customer_records;")
+    li=sqlObj.sqlcursor.fetchall()
+    sqlObj.connect.close()
+
+    if (int(custID.get()),) not in li:
+        messagebox.showerror("Invalid Customer ID", "Customer ID entered is invalid")
+        return None
+
     global OrderEntry,DisplayFrame,DisplayLabel
-
-    RoomServices=Tk()
-    RoomServices.title("Room Service")
-    RoomServices.geometry("300x300")
-
-    TitleMsg=Label(RoomServices, text="ROOM SERVICE", font="Impact 15 underline")
-    TitleMsg.pack(pady=10)
-    
-    MCButton=Button(RoomServices, text="Open Menu Card", command=lambda: MenuCard())
-    MCButton.pack()
-
     OrderFrame=Frame(RoomServices)
     OrderFrame.pack()
 
@@ -174,4 +170,33 @@ def RoomServiceButton():
     DisplayLabel=Label(DisplayFrame)
     DisplayLabel.pack()
 
+def RoomServiceButton():
+    global RoomServices,custID
+
+    RoomServices=Tk()
+    RoomServices.title("Room Service")
+    RoomServices.geometry("300x300")
+
+    TitleMsg=Label(RoomServices, text="ROOM SERVICE", font="Impact 15 underline")
+    TitleMsg.pack(pady=10)
+    
+    MCButton=Button(RoomServices, text="Open Menu Card", command=lambda: MenuCard())
+    MCButton.pack()
+
+    custFrame=Frame(RoomServices)
+    custFrame.pack()
+
+    custIDLabel=Label(custFrame, text="Customer ID>>")
+    custIDLabel.grid(row=0,column=0,padx=2,pady=2)
+
+    custID=Entry(custFrame,width=10)
+    custID.grid(row=0, column=1,padx=2,pady=2)
+
+    okButton=Button(custFrame, text="Ok", command=lambda: on_click())
+    okButton.grid(row=1,column=1,padx=2,pady=2)
+
+    backButton=Button(RoomServices, text="Back", command=lambda: RoomServices.destroy())
+    backButton.pack(pady=10,side=BOTTOM)
+
     RoomServices.mainloop()
+

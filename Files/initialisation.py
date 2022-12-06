@@ -37,8 +37,8 @@ def sqlconnect(x):
         check=2
     cur=connect.cursor()
 
-    cur.execute("create table if not exists Customer_Records(Customer_ID int primary key, Cname varchar(25), RoomNo int, PhoneNo char(10), Address varchar(100));")
-    cur.execute("create table if not exists Room_Details(RoomNo int primary key, Check_In_Date date, Check_Out_Date date, Room_Bill int, Food_Bill int, Total_Bill int);")
+    cur.execute("create table if not exists Customer_Records(Customer_ID int primary key, Cname varchar(25) not null, RoomNo char(5) not null, PhoneNo char(10) not null, Address varchar(100) not null);")
+    cur.execute("create table if not exists Room_Details(RoomNo char(5) primary key, room_type varchar(20) not null, Check_In_Date date not null, Check_Out_Date date not null, Room_Bill int not null, Food_Bill int default 0, Total_Bill int not null default 0, Payment_Status bool DEFAULT FALSE);")
     connect.commit()
     connect.close()
 
@@ -72,3 +72,4 @@ def mainwin():
     Login.grid(column=2,row=3)
 
     sqllogin.mainloop()
+

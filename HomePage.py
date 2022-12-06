@@ -13,6 +13,7 @@ if check==0:
 
 HomePageWin= Tk()
 HomePageWin.title("Home Page")
+HomePageWin.geometry("500x300+500+100")
 
 WelcomeMsg=Label(HomePageWin, text="WELCOME  TO  HOTEL  PHOENIX",font="Broadway 18")
 WelcomeMsg.pack(pady=10)

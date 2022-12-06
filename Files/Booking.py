@@ -21,6 +21,7 @@ def confirmcheck():
         messagebox.showerror("Error","Invalid check-in and check-out dates selected")
 
 def confirmation():
+    global customer
     customer=CustomerClass.Customer()
     customer.customer_name=CName.get()
     customer.customer_id=custid
@@ -44,7 +45,6 @@ def confirmation():
     customer.foodbill=0
     customer.totalbill=0
 
-    customer.customer_update()
     customer.customer_update_sql()
     customer.room_update_sql()    
 
@@ -81,12 +81,16 @@ def RoomBill():
 def destroy():
     BookingRooms.destroy()
 
+def detailsdisplay():
+    DetailsString=f"Name>>{customer.customer_name}\nPhoneNo>>{customer.phno}\nCustomerID>>{customer.customer_id}\nRoomNo>>{customer.roomno}"
+    messagebox.showinfo("Booking Complete",DetailsString)
+
 def BookingButton():
     global BookingRooms, CName, PhNo, Addr, ChkInDate, ChkOutDate, room, Rooms
 
     BookingRooms = Tk()
     BookingRooms.title("Booking")
-    BookingRooms.geometry("500x500")
+    BookingRooms.geometry("500x300")
 
     NameLabel=Label(BookingRooms, text="Enter Name>> ")
     NameLabel.grid(row=0, column=0, pady=5)
@@ -126,7 +130,7 @@ def BookingButton():
     RoomType=OptionMenu(BookingRooms, room, *Rooms)
     RoomType.grid(row=5, column=1, pady=5)
 
-    ConfirmButton=Button(BookingRooms, text="Click to Book", command=lambda: [confirmcheck()])
+    ConfirmButton=Button(BookingRooms, text="Click to Book", command=lambda: [confirmcheck(),detailsdisplay(),destroy()])
     ConfirmButton.grid(row=6,column=1, pady=5)
 
     BackButton=Button(BookingRooms, text="Back", command=lambda:destroy())
