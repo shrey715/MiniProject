@@ -50,6 +50,7 @@ def on_click():
 
     customer=CustomerClass.Customer()
     customer.customer_load(int(custID.get()))
+    customer.totalbill=customer.roombill + customer.foodbill
 
     holdFrame=Frame(MainWin)
     holdFrame.pack(pady=2)
@@ -70,7 +71,7 @@ def on_click():
     AmountLabel.grid(row=1, column=1,padx=2, pady=2)
     
     payButton=Button(holdFrame, text="Pay for Phoenix", command=lambda: showBill())
-    payButton.grid(row=1,column=1,padx=2,pady=2)
+    payButton.grid(row=2,column=1,padx=2,pady=2)
 
 def PaymentButton():
     global MainWin, custID
